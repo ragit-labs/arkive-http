@@ -7,6 +7,10 @@ name = "pypi"
 arkive-db = {file = "../arkive-db"}
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
+python-jose = {extras = ["cryptography"], version = "*"}
+python-multipart = "*"
+requests = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
