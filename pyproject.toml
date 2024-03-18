@@ -1,0 +1,15 @@
+[project]
+name="arkive-web-service"
+version="0.0.1"
+description="Web service that powers the web app for arkive"
+readme="README.md"
+requires-python = ">=3.10"
+authors = [
+  {name = "Akash Mishra", email = "akashdotcodes@gmail.com" }
+]
+maintainers = [
+  {name = "Akash Mishra", email = "akashdotcodes@gmail.com" }
+]
+dependencies = [
+  
+]
