@@ -4,6 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+arkive-db = {file = "../arkive-db"}
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
 
 [dev-packages]
 

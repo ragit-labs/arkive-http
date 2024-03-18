@@ -13,3 +13,9 @@ maintainers = [
 dependencies = [
   
 ]
+
+[project.scripts]
+arkive-web-service = "arkive_web_service.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
