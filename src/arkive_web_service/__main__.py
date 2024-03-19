@@ -6,6 +6,7 @@ import requests
 from jose import jwt
 from dotenv import dotenv_values
 from fastapi.responses import RedirectResponse
+import secrets
 
 config = dotenv_values(".env")
 app = FastAPI()
@@ -14,6 +15,11 @@ oauth2_scheme = OAuth2AuthorizationCodeBearer(authorizationUrl="http://localhost
 GOOGLE_CLIENT_ID = config["GOOGLE_CLIENT_ID"]
 GOOGLE_CLIENT_SECRET = config["GOOGLE_CLIENT_SECRET"]
 GOOGLE_REDIRECT_URI = config["GOOGLE_REDIRECT_URI"]
+
+
+# ------ SESSION -----
+# TODO: move this to dedicated session storage
+
 
 # TODO: add sessions here
 # TODO: move login calls to separate helpers
