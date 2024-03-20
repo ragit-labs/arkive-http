@@ -56,13 +56,13 @@ async def auth_google(request: Request, code: str):
 
     if user is None:
         # Create new user in database
-        insert_user_to_database(
+        await insert_user_to_database(
             email,
-            user.get("name"),
-            user.get("given_name"),
+            user_info.get("name"),
+            user_info.get("given_name"),
             SignInProvider.GOOGLE,
-            user.get("family_name", None),
-            user.get("picture", None),
+            user_info.get("family_name", None),
+            user_info.get("picture", None),
         )
 
     return user_info

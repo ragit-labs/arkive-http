@@ -3,6 +3,7 @@ from arkive_web_service.database import db
 from sqlalchemy import select
 from arkive_web_service.enums import SignInProvider
 from typing import Optional
+from arkive_web_service.mappers import signin_provide_enum_to_database
 
 
 async def get_user_from_database(email: str):
@@ -16,7 +17,7 @@ async def insert_user_to_database(
     email: str,
     full_name: str,
     first_name: str,
-    siginin_provider: SignInProvider,
+    signin_provider: SignInProvider,
     last_name: Optional[str],
     display_picture_url: Optional[str],
 ):
@@ -24,7 +25,7 @@ async def insert_user_to_database(
         email=email,
         full_name=full_name,
         first_name=first_name,
-        siginin_provider=siginin_provider,
+        signin_provider=signin_provide_enum_to_database(signin_provider),
         last_name=last_name,
         display_picture_url=display_picture_url,
     )
@@ -32,6 +33,6 @@ async def insert_user_to_database(
     async with db.session() as session:
         session.add(user)
         try:
-            session.commit()
+            await session.commit()
         except Exception as ex:
             raise Exception("Something went wrong while inserting the user", str(ex))
