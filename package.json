@@ -1,0 +1,11 @@
+{
+  "name": "arkive-web-service",
+  "version": "0.0.1",
+  "description": "Arkive Web Service",
+  "devDependencies": {},
+  "scripts": {
+    "format": "black src/"
+  },
+  "author": "Akash Mishra",
+  "dependencies": {}
+}
