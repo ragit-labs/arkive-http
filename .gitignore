@@ -17,5 +17,11 @@ var/
 .installed.cfg
 *.egg
 
+# mypy
+.mypy_cache/
+
+.yarn
+
+
 .env
 node_modules

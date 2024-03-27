@@ -2,10 +2,11 @@
   "name": "arkive-web-service",
   "version": "0.0.1",
   "description": "Arkive Web Service",
-  "devDependencies": {},
   "scripts": {
-    "format": "black src/"
+    "format": "black src/",
+    "lint": "flake8 src/ *.py",
+    "mypy": "mypy src/",
+    "test": "npm run lint && npm run mypy"
   },
-  "author": "Akash Mishra",
-  "dependencies": {}
+  "author": "Akash Mishra"
 }

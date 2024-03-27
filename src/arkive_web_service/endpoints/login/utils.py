@@ -13,6 +13,13 @@ async def get_user_from_database(email: str):
         return user
 
 
+async def get_user_from_database_using_id(id: str):
+    async with db.session() as session:
+        query = select(User).where(User.id == id)
+        user = (await session.execute(query)).scalars().one_or_none()
+        return user
+
+
 async def insert_user_to_database(
     email: str,
     full_name: str,
@@ -36,3 +43,4 @@ async def insert_user_to_database(
             await session.commit()
         except Exception as ex:
             raise Exception("Something went wrong while inserting the user", str(ex))
+    return user

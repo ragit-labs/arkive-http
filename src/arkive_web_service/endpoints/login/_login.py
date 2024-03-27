@@ -1,16 +1,10 @@
 from fastapi import Depends, Request, APIRouter
-from fastapi.security import OAuth2AuthorizationCodeBearer
 import requests
-from jose import jwt
 from fastapi.responses import RedirectResponse
 from arkive_web_service.settings import settings
 from .utils import get_user_from_database, insert_user_to_database
 from arkive_web_service.enums import SignInProvider
 
-
-oauth2_scheme = OAuth2AuthorizationCodeBearer(
-    authorizationUrl="http://localhost:8000", tokenUrl="token"
-)
 
 router = APIRouter(tags=["login", "google", "sso"])
 
@@ -65,9 +59,4 @@ async def auth_google(request: Request, code: str):
             user_info.get("picture", None),
         )
 
-    return user_info
-
-
-@router.get("/token")
-async def get_token(request: Request, token: str = Depends(oauth2_scheme)):
-    return jwt.decode(token, settings.GOOGLE_CLIENT_SECRET, algorithms=["HS256"])
+    return user.id
