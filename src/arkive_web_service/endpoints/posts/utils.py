@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 import uuid
 from datetime import datetime
 
+
 async def get_all_cards_for_user(user_id: str) -> Sequence[Post]:
     query = select(User).options(selectinload(User.posts)).where(User.id == user_id)
     async with db.session() as session:

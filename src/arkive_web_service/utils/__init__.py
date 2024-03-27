@@ -17,6 +17,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+
 async def parse_user_from_token(token: str):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -40,7 +41,9 @@ async def get_current_user(request: Request):
     authorization: str = request.headers.get("Authorization")
     if not authorization:
         raise HTTPException(status_code=401, detail="Authorization header missing.")
-    token = authorization.split("Bearer ")[1] if len(authorization.split(" ")) > 1 else None
+    token = (
+        authorization.split("Bearer ")[1] if len(authorization.split(" ")) > 1 else None
+    )
     if not token:
         raise HTTPException(status_code=401, detail="Invalid or expired token.")
     user = await parse_user_from_token(token)
@@ -53,4 +56,5 @@ def login_required(endpoint: Callable):
     async def wrapper(*args, **kwargs):
         await get_current_user(*args, **kwargs)
         return await endpoint(*args, **kwargs)
+
     return wrapper
