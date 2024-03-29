@@ -4,7 +4,53 @@ from datetime import datetime, timedelta
 from ..constants import SECRET_KEY, ALGORITHM
 from jose import JWTError, jwt
 from typing import Callable
-from ..endpoints.login.utils import get_user_from_database_using_id
+
+from arkive_db.models import User
+from arkive_web_service.database import db
+from sqlalchemy import select
+from arkive_web_service.enums import SignInProvider
+from typing import Optional
+from arkive_web_service.mappers import signin_provide_enum_to_database
+
+
+async def get_user_from_database(email: str):
+    async with db.session() as session:
+        query = select(User).where(User.email == email)
+        user = (await session.execute(query)).scalars().one_or_none()
+        return user
+
+
+async def get_user_from_database_using_id(id: str):
+    async with db.session() as session:
+        query = select(User).where(User.id == id)
+        user = (await session.execute(query)).scalars().one_or_none()
+        return user
+
+
+async def insert_user_to_database(
+    email: str,
+    full_name: str,
+    first_name: str,
+    signin_provider: SignInProvider,
+    last_name: Optional[str],
+    display_picture_url: Optional[str],
+):
+    user = User(
+        email=email,
+        full_name=full_name,
+        first_name=first_name,
+        signin_provider=signin_provide_enum_to_database(signin_provider),
+        last_name=last_name,
+        display_picture_url=display_picture_url,
+    )
+
+    async with db.session() as session:
+        session.add(user)
+        try:
+            await session.commit()
+        except Exception as ex:
+            raise Exception("Something went wrong while inserting the user", str(ex))
+    return user
 
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
@@ -18,7 +64,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
-async def parse_user_from_token(token: str):
+async def parse_user_id_from_token(token: str):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -26,35 +72,9 @@ async def parse_user_from_token(token: str):
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: str = payload.get("sub")
+        user_id: str = payload.get("user_id")
         if user_id is None:
             raise credentials_exception
-        user = await get_user_from_database_using_id(user_id)
-        if user is None:
-            raise credentials_exception
-        return user
     except JWTError:
         raise credentials_exception
-
-
-async def get_current_user(request: Request):
-    authorization: str = request.headers.get("Authorization")
-    if not authorization:
-        raise HTTPException(status_code=401, detail="Authorization header missing.")
-    token = (
-        authorization.split("Bearer ")[1] if len(authorization.split(" ")) > 1 else None
-    )
-    if not token:
-        raise HTTPException(status_code=401, detail="Invalid or expired token.")
-    user = await parse_user_from_token(token)
-    if not user:
-        raise HTTPException(status_code=401, detail="User not found")
-    return user
-
-
-def login_required(endpoint: Callable):
-    async def wrapper(*args, **kwargs):
-        await get_current_user(*args, **kwargs)
-        return await endpoint(*args, **kwargs)
-
-    return wrapper
+    return user_id

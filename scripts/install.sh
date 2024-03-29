@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 VENV_PATH=./.venv
 
 rm -rf ${VENV_PATH}

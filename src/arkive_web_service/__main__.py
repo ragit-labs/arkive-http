@@ -1,10 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from .dependencies import login_required
 import uvicorn
 
-from .endpoints import login
 from .endpoints import posts
-from .endpoints.auth import auth_router
+from .endpoints import auth
+from .endpoints import profile
+from .endpoints import processor
 
 # TODO: move this origins to config later
 origins = [
@@ -22,9 +24,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(login.router)
-app.include_router(posts.router)
-app.include_router(auth_router)
+app.include_router(auth.router)
+app.include_router(posts.router, dependencies=[Depends(login_required)])
+app.include_router(profile.router, dependencies=[Depends(login_required)])
+app.include_router(processor.router)
 
 
 def main():

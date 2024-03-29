@@ -17,6 +17,7 @@ asyncpg = "*"
 sqlalchemy = {extras = ["asyncio"], version = "*"}
 greenlet = "*"
 passlib = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 black = "*"
