@@ -1,11 +1,20 @@
 from sqlalchemy import select
 from arkive_db.models import User, Post
-from typing import Sequence
+from typing import Sequence, Optional
 from sqlalchemy import select
 from arkive_web_service.database import db
 from sqlalchemy.orm import selectinload
 import uuid
 from datetime import datetime
+
+
+
+def is_valid_uuid(val):
+    try:
+        uuid.UUID(str(val))
+        return True
+    except ValueError:
+        return False
 
 
 async def get_all_cards_for_user(user_id: str) -> Sequence[Post]:
@@ -27,3 +36,9 @@ async def create_post(user_id: str) -> uuid.UUID:
         session.add(post)
         await session.commit()
         return post.id
+
+
+async def get_post(post_id: str) -> Optional[Post]:
+    async with db.session() as session:
+        result = (await session.execute(select(Post).where(Post.id == post_id))).scalar_one_or_none()
+        return result

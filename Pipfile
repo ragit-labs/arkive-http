@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-arkive-db = {file = "../arkive-db"}
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 python-jose = {extras = ["cryptography"], version = "*"}
@@ -18,6 +17,7 @@ sqlalchemy = {extras = ["asyncio"], version = "*"}
 greenlet = "*"
 passlib = "*"
 beautifulsoup4 = "*"
+arkive-db = {file = "../arkive-db"}
 
 [dev-packages]
 black = "*"
