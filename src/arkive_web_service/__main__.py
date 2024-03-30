@@ -6,7 +6,6 @@ import uvicorn
 from .endpoints import posts
 from .endpoints import auth
 from .endpoints import profile
-from .endpoints import processor
 
 # TODO: move this origins to config later
 origins = [
@@ -27,7 +26,6 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(posts.router)
 app.include_router(profile.router, dependencies=[Depends(login_required)])
-app.include_router(processor.router)
 
 
 def main():
