@@ -2,11 +2,10 @@ from sqlalchemy import select
 from arkive_db.models import User, Post
 from typing import Sequence, Optional
 from sqlalchemy import select
+from fastapi import HTTPException
 from arkive_web_service.database import db
 from sqlalchemy.orm import selectinload
 import uuid
-from datetime import datetime
-
 
 
 def is_valid_uuid(val):
@@ -24,21 +23,23 @@ async def get_all_cards_for_user(user_id: str) -> Sequence[Post]:
         return result.posts
 
 
-async def create_post(user_id: str) -> uuid.UUID:
-    async with db.session() as session:
-        post = Post(
-            description="Test Description",
-            url="https://google.com",
-            banner="https://www.devart.com/dbforge/postgresql/how-to-install-postgresql-on-macos/images/launch-installation.png",
-            timestamp=datetime.now(),
-            user_id=user_id,
-        )
-        session.add(post)
-        await session.commit()
-        return post.id
-
-
 async def get_post(post_id: str) -> Optional[Post]:
     async with db.session() as session:
-        result = (await session.execute(select(Post).where(Post.id == post_id))).scalar_one_or_none()
+        result = (
+            await session.execute(select(Post).where(Post.id == post_id))
+        ).scalar_one_or_none()
         return result
+
+
+async def remove_post_for_user(post_id: str, user_id: str):
+    async with db.session() as session:
+        post = (
+            await session.execute(select(Post).where(Post.id == post_id))
+        ).scalar_one_or_none()
+        if post is None:
+            raise HTTPException(status_code=404, detail="Post not found")
+        user = (
+            await session.execute(select(User).where(User.id == user_id))
+        ).scalar_one_or_none()
+        post.users.remove(user)
+        await session.commit()
