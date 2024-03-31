@@ -54,5 +54,4 @@ class Database:
         yield
 
 
-print(settings.DATABASE_URL)
 db = Database(settings.DATABASE_URL)

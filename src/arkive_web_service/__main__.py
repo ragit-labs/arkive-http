@@ -6,11 +6,13 @@ import uvicorn
 from .endpoints import posts
 from .endpoints import auth
 from .endpoints import profile
+from .endpoints import parser
 
 # TODO: move this origins to config later
 origins = [
     "http://localhost",
     "http://localhost:5173",
+    "*",
 ]
 
 
@@ -26,6 +28,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(posts.router)
 app.include_router(profile.router, dependencies=[Depends(login_required)])
+app.include_router(parser.router)
 
 
 def main():

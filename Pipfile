@@ -17,6 +17,7 @@ sqlalchemy = {extras = ["asyncio"] }
 greenlet = "*"
 passlib = "*"
 beautifulsoup4 = "*"
+openai = "*"
 
 [dev-packages]
 black = "*"

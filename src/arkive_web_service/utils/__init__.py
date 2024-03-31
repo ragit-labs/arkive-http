@@ -33,16 +33,15 @@ async def insert_user_to_database(
     last_name: Optional[str],
     display_picture_url: Optional[str],
 ):
-    user = User(
-        email=email,
-        full_name=full_name,
-        first_name=first_name,
-        signin_provider=signin_provide_enum_to_database(signin_provider),
-        last_name=last_name,
-        display_picture_url=display_picture_url,
-    )
-
     async with db.session() as session:
+        user = User(
+            email=email,
+            full_name=full_name,
+            first_name=first_name,
+            signin_provider=signin_provide_enum_to_database(signin_provider),
+            last_name=last_name,
+            display_picture_url=display_picture_url,
+        )
         session.add(user)
         try:
             await session.commit()
