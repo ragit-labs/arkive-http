@@ -1,5 +1,4 @@
-from functools import wraps
-from fastapi import HTTPException, Request, status
+from fastapi import HTTPException, status
 from datetime import datetime, timedelta
 from ..constants import JWT_SECRET_KEY, JWT_ALGORITHM, JWT_DEFAULT_EXPIRY
 from jose import JWTError, jwt
@@ -52,7 +51,7 @@ async def insert_user_to_database(
     return user
 
 
-def create_access_token(data: dict, expires_delta: timedelta = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta

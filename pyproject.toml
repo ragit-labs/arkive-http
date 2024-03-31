@@ -19,3 +19,10 @@ arkive-web-service = "arkive_web_service.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[[tool.mypy.overrides]]
+module = [
+    "dynaconf",
+    "jose"
+]
+ignore_missing_imports = true

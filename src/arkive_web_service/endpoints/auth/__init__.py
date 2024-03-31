@@ -1,11 +1,11 @@
 from datetime import timedelta
-from fastapi import HTTPException, APIRouter, Request
+from fastapi import HTTPException, APIRouter
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import requests
 from ...utils import get_user_from_database, insert_user_to_database
 from arkive_web_service.enums import SignInProvider
 from arkive_db.models import User
-from pydantic import BaseModel
 from ...constants import ACCESS_TOKEN_EXPIRE_MINUTES
 from ...utils import create_access_token
 
@@ -45,7 +45,7 @@ async def authenticate_user(google_access_token: str) -> User:
 
 
 @router.post("/authenticate/google", response_model=Token)
-async def login_for_access_token(token_request: TokenRequest):
+async def login_for_access_token(token_request: TokenRequest) -> JSONResponse:
     user = await authenticate_user(token_request.google_access_token)
     if not user:
         raise HTTPException(
@@ -55,8 +55,11 @@ async def login_for_access_token(token_request: TokenRequest):
     access_token = create_access_token(
         data={"user_id": str(user.id)}, expires_delta=access_token_expires
     )
-    return {
-        "access_token": access_token,
-        "token_type": "Bearer",
-        "expiry": ACCESS_TOKEN_EXPIRE_MINUTES,
-    }
+    return JSONResponse(
+        content={
+            "access_token": access_token,
+            "token_type": "Bearer",
+            "expiry": ACCESS_TOKEN_EXPIRE_MINUTES,
+        },
+        status_code=200,
+    )
