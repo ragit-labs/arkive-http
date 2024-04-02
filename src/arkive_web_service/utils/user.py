@@ -1,8 +1,3 @@
-from fastapi import HTTPException, status
-from datetime import datetime, timedelta
-from ..constants import JWT_SECRET_KEY, JWT_ALGORITHM, JWT_DEFAULT_EXPIRY
-from jose import JWTError, jwt
-
 from arkive_db.models import User
 from arkive_web_service.database import db
 from sqlalchemy import select
@@ -48,30 +43,3 @@ async def insert_user_to_database(
         except Exception as ex:
             raise Exception("Something went wrong while inserting the user", str(ex))
     return user
-
-
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=JWT_DEFAULT_EXPIRY)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
-    return encoded_jwt
-
-
-async def parse_user_id_from_token(token: str):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        user_id: str = payload.get("user_id")
-        if user_id is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-    return user_id

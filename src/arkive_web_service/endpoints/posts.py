@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.responses import JSONResponse
-from .utils import (
+from ..utils.post import (
     get_all_cards_for_user,
     get_post,
     is_valid_uuid,
     remove_post_for_user,
     insert_post_for_user,
 )
-from ...utils import get_user_from_database_using_id
-from ...dependencies import login_required, admin_only
-from ...types import PostDeleteRequestData, PostInsertRequestData
+from ..utils.user import get_user_from_database_using_id
+from ..dependencies.auth import login_required, admin_only
+from ..types import PostDeleteRequestData, PostInsertRequestData
 
 
 router = APIRouter(tags=["bookmarks", "feed"])

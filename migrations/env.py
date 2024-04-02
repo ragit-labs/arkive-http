@@ -4,6 +4,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from src.arkive_db.models import Base
 from alembic import context
+from dynaconf import settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -38,7 +39,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = config.get_main_option("sqlalchemy.url", settings.MIGRATION_URL)
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -57,6 +58,7 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    config.set_main_option("sqlalchemy.url", settings.MIGRATION_URL)
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",

@@ -1,5 +1,5 @@
 from fastapi import Request, HTTPException
-from ..utils import parse_user_id_from_token
+from ..utils.auth import parse_user_id_from_token
 from jose import jwt
 from typing import Optional
 from ..constants import JWT_SECRET_KEY, JWT_ALGORITHM

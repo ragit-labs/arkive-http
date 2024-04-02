@@ -1,12 +1,37 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from .dependencies import login_required
+from .dependencies.auth import login_required
 import uvicorn
+import logging
+import logging.config
+import sys
+from .middlewares import LoggingMiddleware
 
 from .endpoints import posts
 from .endpoints import auth
 from .endpoints import profile
 from .endpoints import parser
+
+logging_config = {
+    "version": 1,
+    "formatters": {
+        "json": {
+            "class": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            "format": "%(asctime)s %(process)s %(levelname)s %(name)s %(module)s %(funcName)s %(lineno)s",
+        }
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "json",
+            "stream": sys.stderr,
+        }
+    },
+    "root": {"level": "DEBUG", "handlers": ["console"], "propagate": True},
+}
+
+logging.config.dictConfig(logging_config)
 
 # TODO: move this origins to config later
 origins = [
@@ -16,7 +41,13 @@ origins = [
 ]
 
 
-app = FastAPI()
+app = FastAPI(name="Arkive Web Service", debug=True)
+
+app.add_middleware(
+    LoggingMiddleware,
+    logger=logging.getLogger(__name__),
+)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

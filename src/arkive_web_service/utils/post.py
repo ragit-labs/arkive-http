@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from arkive_web_service.database import db
 from sqlalchemy.orm import selectinload
 import uuid
-from ...types import PostInsertRequestData
+from ..types import PostInsertRequestData
 
 
 def is_valid_uuid(val):
