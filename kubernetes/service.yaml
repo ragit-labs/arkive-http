@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubernetes.digitalocean.com/load-balancer-name: "arkive-web-server"
+    service.beta.kubernetes.io/do-loadbalancer-protocol: "https"
+    service.beta.kubernetes.io/do-loadbalancer-certificate-id: "bf7fdde5-8825-45ad-bc9e-ef2e9dd76723"
+    service.beta.kubernetes.io/do-loadbalancer-disable-lets-encrypt-dns-records: "false"
+  name: arkive-web-server-service
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8000
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    app: arkive-web-server
+  type: LoadBalancer

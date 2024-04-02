@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arkive-web-server-deployment
+  labels:
+    app: arkive-web-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arkive-web-server
+  template:
+    metadata:
+      labels:
+        app: arkive-web-server
+    spec:
+      containers:
+      - name: arkive-web-server
+        image: arkive-web-server
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 8000
