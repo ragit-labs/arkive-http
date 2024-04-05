@@ -21,6 +21,7 @@ openai = "*"
 alembic = "*"
 pytz = "*"
 python-json-logger = "*"
+sentry-sdk = {extras = ["fastapi"], version = "*"}
 
 [dev-packages]
 black = "*"

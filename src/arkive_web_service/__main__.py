@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+import sentry_sdk
 from fastapi.middleware.cors import CORSMiddleware
 from .dependencies.auth import login_required
 import uvicorn
@@ -6,11 +7,19 @@ import logging
 import logging.config
 import sys
 from .middlewares import LoggingMiddleware
+from .settings import settings
 
 from .endpoints import posts
 from .endpoints import auth
 from .endpoints import profile
 from .endpoints import parser
+from .endpoints import internal
+
+sentry_sdk.init(
+    dsn=settings.SENTRY_DSN,
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+)
 
 logging_config = {
     "version": 1,
@@ -33,14 +42,6 @@ logging_config = {
 
 logging.config.dictConfig(logging_config)
 
-# TODO: move this origins to config later
-origins = [
-    "http://localhost",
-    "http://localhost:5173",
-    "*",
-]
-
-
 app = FastAPI(name="Arkive Web Service", debug=True)
 
 app.add_middleware(
@@ -50,7 +51,7 @@ app.add_middleware(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.ALLOWED_HOSTS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -60,6 +61,7 @@ app.include_router(auth.router)
 app.include_router(posts.router)
 app.include_router(profile.router, dependencies=[Depends(login_required)])
 app.include_router(parser.router)
+app.include_router(internal.router)
 
 
 def main():
