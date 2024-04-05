@@ -1,22 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: arkive-web-server-deployment
+  name: arkive-http-deployment
   labels:
-    app: arkive-web-server
+    app: arkive-http
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: arkive-web-server
+      app: arkive-http
   template:
     metadata:
       labels:
-        app: arkive-web-server
+        app: arkive-http
     spec:
       containers:
-      - name: arkive-web-server
-        image: arkive-web-server
-        imagePullPolicy: Never
+      - name: arkive-http
+        image: rainmain/arkive-http:0.1
+        imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 8000
+        env:
+          - name: DYNACONF_DATABASE_URL
+            value: "postgresql+asyncpg://arkive_admin:arkive1234@arkive-dev-do-user-16211520-0.c.db.ondigitalocean.com:25060/arkive_dev"
+          - name: DYNACONF_SENTRY_DSN
+            value: "https://385a999c5c949b08fa8c9502f128a3c2@o4507034648903680.ingest.us.sentry.io/4507034687504384"
+          - name: DYNACONF_ALLOWED_HOSTS
+            value: "*,localhost"
+      imagePullSecrets:
+        - name: regcred
