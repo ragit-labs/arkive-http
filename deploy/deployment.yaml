@@ -17,10 +17,12 @@ spec:
       containers:
       - name: arkive-http
         image: rainmain/arkive-http:0.1
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
           - containerPort: 8000
         env:
+          - name: DYNACONF_ARKIVE_LLM_API_URI
+            value: "http://arkive-llm-service.default.svc.cluster.local"
           - name: DYNACONF_DATABASE_URL
             value: "postgresql+asyncpg://arkive_admin:arkive1234@arkive-dev-do-user-16211520-0.c.db.ondigitalocean.com:25060/arkive_dev"
           - name: DYNACONF_SENTRY_DSN

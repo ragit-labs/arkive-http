@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 from fastapi.responses import JSONResponse
 from ..dependencies.auth import login_required
 from ..utils.decorators import fire_and_forget
+from ..settings import settings
 import requests
 
 
@@ -17,7 +18,7 @@ class SaveRequestData(BaseModel):
 @fire_and_forget
 def send_to_processor(data: dict):
     url = (
-        "https://ea98-2405-201-300a-8bd9-8d3a-8ff1-6212-4d06.ngrok-free.app/handle/html"
+        f"{settings.ARKIVE_LLM_API_URI}/handle"
     )
     response = requests.post(url, json=data)
     print(response.status_code)
