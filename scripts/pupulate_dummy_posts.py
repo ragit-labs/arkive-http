@@ -1,19 +1,21 @@
-from arkive_db.models import Post, User
-from sqlalchemy import select
-import uuid
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 import asyncio
+import uuid
 from datetime import datetime
-from faker import Faker
+
 import requests
+from faker import Faker
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+from arkive_db.models import Post, User
 
 lorem_picsum = "https://picsum.photos/200/300"
 
 
-engine = create_async_engine("postgresql+asyncpg://arkive_admin:arkive1234@localhost:5432/arkive")
-async_session = async_sessionmaker(
-    engine, expire_on_commit=False, class_=AsyncSession
+engine = create_async_engine(
+    "postgresql+asyncpg://arkive_admin:arkive1234@localhost:5432/arkive"
 )
+async_session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
 
 async def main():
@@ -32,10 +34,12 @@ async def main():
                 banner=str(image.url),
                 extra_metadata={"author": fake.name()},
                 timestamp=datetime.now(),
-            ) for i in range(30)
+            )
+            for i in range(30)
         ]
         session.add_all(posts)
         user.posts.extend(posts)
         await session.commit()
+
 
 asyncio.run(main())

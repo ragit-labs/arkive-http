@@ -1,32 +1,27 @@
 from __future__ import annotations
-from sqlalchemy.orm import DeclarativeBase
+
+import uuid
+from datetime import datetime
+from typing import List
+
 from sqlalchemy import (
-    Table,
     Column,
-    ForeignKey,
     DateTime,
+    ForeignKey,
     String,
+    Table,
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import UUID, JSONB, ENUM
-import uuid
-from datetime import datetime
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import List
+from sqlalchemy.dialects.postgresql import ENUM, JSONB, UUID
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
 from ..enums import SignInProvider
 
 
 class Base(DeclarativeBase):
     pass
 
-
-user_post_association = Table(
-    "user_post",
-    Base.metadata,
-    Column("user_id", UUID(as_uuid=True), ForeignKey("user.id"), primary_key=True),
-    Column("post_id", UUID(as_uuid=True), ForeignKey("post.id"), primary_key=True),
-)
 
 tag_post_association = Table(
     "tag_post",
@@ -48,8 +43,8 @@ class Post(Base):
     banner: Mapped[str] = mapped_column(String(), nullable=True)
     timestamp: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
     extra_metadata: Mapped[dict] = mapped_column(JSONB(), nullable=True)
-    users: Mapped[List[User]] = relationship(
-        "User", back_populates="posts", secondary=user_post_association, lazy="selectin"
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )
     tags: Mapped[List[Tag]] = relationship(
         "Tag", back_populates="posts", secondary=tag_post_association, lazy="selectin"
@@ -88,6 +83,3 @@ class User(Base):
         ENUM(SignInProvider), nullable=False
     )
     extra_metadata: Mapped[dict] = mapped_column(JSONB(), nullable=True)
-    posts: Mapped[List[Post]] = relationship(
-        "Post", back_populates="users", secondary=user_post_association, lazy="selectin"
-    )

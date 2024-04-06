@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "Arkive Web Service",
   "scripts": {
-    "format": "black src/",
-    "lint": "flake8 src/ *.py",
+    "format": "isort **/*.py && black **/*.py",
+    "lint": "flake8 src/**/*.py migrations/**/*.py",
     "mypy": "mypy src/",
     "test": "npm run lint && npm run mypy"
   },

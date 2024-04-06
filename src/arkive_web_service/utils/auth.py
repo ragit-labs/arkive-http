@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta, timezone
-from ..constants import JWT_SECRET_KEY, JWT_ALGORITHM, JWT_DEFAULT_EXPIRY
-from jose import jwt, JWTError
-from fastapi import HTTPException, status
-
 from typing import Optional
+
+from fastapi import HTTPException, status
+from jose import JWTError, jwt
+
+from ..constants import JWT_ALGORITHM, JWT_DEFAULT_EXPIRY, JWT_SECRET_KEY
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):

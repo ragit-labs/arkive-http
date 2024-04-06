@@ -1,8 +1,10 @@
-from fastapi import Request, HTTPException
-from ..utils.auth import parse_user_id_from_token
-from jose import jwt
 from typing import Optional
-from ..constants import JWT_SECRET_KEY, JWT_ALGORITHM
+
+from fastapi import HTTPException, Request
+from jose import jwt
+
+from ..constants import JWT_ALGORITHM, JWT_SECRET_KEY
+from ..utils.auth import parse_user_id_from_token
 
 
 async def _get_token(request: Request) -> str:

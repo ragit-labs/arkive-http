@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
-from pydantic import BaseModel, Field
-from fastapi.responses import JSONResponse
-from ..dependencies.auth import login_required
-from ..utils.decorators import fire_and_forget
-from ..settings import settings
 import requests
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
 
+from ..dependencies.auth import login_required
+from ..settings import settings
+from ..utils.decorators import fire_and_forget
 
 router = APIRouter(tags=["bookmarks", "feed"])
 
@@ -17,9 +17,7 @@ class SaveRequestData(BaseModel):
 
 @fire_and_forget
 def send_to_processor(data: dict):
-    url = (
-        f"{settings.ARKIVE_LLM_API_URI}/handle"
-    )
+    url = f"{settings.ARKIVE_LLM_API_URI}/handle"
     response = requests.post(url, json=data)
     print(response.status_code)
 

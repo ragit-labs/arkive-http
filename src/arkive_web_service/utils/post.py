@@ -1,10 +1,21 @@
-from sqlalchemy import select
-from arkive_db.models import User, Post, Tag
-from typing import Sequence, Optional
-from fastapi import HTTPException
-from arkive_web_service.database import db
-from sqlalchemy.orm import selectinload
 import uuid
+from typing import Optional, Sequence
+
+from fastapi import HTTPException
+from sqlalchemy import select
+
+from arkive_db.models import Post, Tag, User
+from arkive_web_service.database import db
+
+from ..post_filter_engine import (
+    get_sqlalchemy_filter_clause,
+    get_sqlalchemy_sort_clause,
+)
+from ..post_filter_engine.types import (
+    GetAllRequest,
+    GetAllRequestSort,
+    GetAllRequestSortDirection,
+)
 from ..types import PostInsertRequestData
 
 
@@ -16,11 +27,34 @@ def is_valid_uuid(val):
         return False
 
 
-async def get_all_cards_for_user(user_id: str) -> Sequence[Post]:
-    query = select(User).options(selectinload(User.posts)).where(User.id == user_id)
+async def get_all_posts_for_user_conditioned(
+    user_id: str, get_all_request: GetAllRequest
+) -> Sequence[Post]:
+    filters = (
+        get_sqlalchemy_filter_clause(get_all_request.where)
+        if get_all_request.where
+        else None
+    )
+    limit = get_all_request.limit if get_all_request.limit else 10
+    skip = get_all_request.skip if get_all_request.skip else 0
+    sort_clause = (
+        get_sqlalchemy_sort_clause(get_all_request.sort)
+        if get_all_request.sort
+        else get_sqlalchemy_sort_clause(
+            GetAllRequestSort(
+                field="timestamp", direction=GetAllRequestSortDirection.desc
+            )
+        )
+    )
     async with db.session() as session:
-        result = (await session.execute(query)).scalars().one()
-        return result.posts
+        query = select(Post).filter(Post.user_id == user_id)
+        if filters:
+            query = query.filter(*filters)
+        if sort_clause:
+            query = query.order_by(sort_clause)
+        query = query.limit(limit).offset(skip)
+        result = (await session.execute(query)).scalars().all()
+        return result
 
 
 async def get_post(post_id: str) -> Optional[Post]:
@@ -47,9 +81,6 @@ async def remove_post_for_user(post_id: str, user_id: str):
 
 async def insert_post_for_user(post_request_data: PostInsertRequestData):
     async with db.session() as session:
-        user_query = select(User).where(User.id == post_request_data.user_id)
-        user = (await session.execute(user_query)).scalar_one_or_none()
-
         tags_query = select(Tag).where(Tag.name.in_(post_request_data.tags))
         tags_in_db = (await session.execute(tags_query)).scalars().all()
         tag_names_in_db = [tag.name for tag in tags_in_db]
@@ -71,8 +102,8 @@ async def insert_post_for_user(post_request_data: PostInsertRequestData):
             banner=post_request_data.banner,
             timestamp=post_request_data.timestamp,
             extra_metadata=post_request_data.extra_metadata,
+            user_id=post_request_data.user_id,
         )
-        post.users.append(user)
         post.tags.extend(tags_in_db)
         post.tags.extend(new_tags)
         session.add(post)

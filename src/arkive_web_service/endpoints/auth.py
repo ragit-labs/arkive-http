@@ -1,13 +1,16 @@
 from datetime import timedelta
-from fastapi import HTTPException, APIRouter
+
+import requests
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-import requests
-from ..utils.user import get_user_from_database, insert_user_to_database
-from arkive_web_service.enums import SignInProvider
+
 from arkive_db.models import User
+from arkive_web_service.enums import SignInProvider
+
 from ..constants import ACCESS_TOKEN_EXPIRE_MINUTES
 from ..utils.auth import create_access_token
+from ..utils.user import get_user_from_database, insert_user_to_database
 
 
 class TokenRequest(BaseModel):

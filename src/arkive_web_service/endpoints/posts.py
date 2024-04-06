@@ -1,25 +1,27 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
+
+from ..dependencies.auth import admin_only, login_required
+from ..post_filter_engine.types import GetAllRequest
+from ..types import PostDeleteRequestData, PostInsertRequestData
 from ..utils.post import (
-    get_all_cards_for_user,
+    get_all_posts_for_user_conditioned,
     get_post,
+    insert_post_for_user,
     is_valid_uuid,
     remove_post_for_user,
-    insert_post_for_user,
 )
-from ..utils.user import get_user_from_database_using_id
-from ..dependencies.auth import login_required, admin_only
-from ..types import PostDeleteRequestData, PostInsertRequestData
-
 
 router = APIRouter(tags=["bookmarks", "feed"])
 
 
-@router.get("/all", dependencies=[Depends(login_required)])
-async def get_all(request: Request) -> JSONResponse:
-    user = await get_user_from_database_using_id(request.state.user_id)
-    posts = await get_all_cards_for_user(user.id)
-    return posts  # type: ignore
+@router.post("/all", dependencies=[Depends(login_required)])
+async def get_all_where(
+    request: Request, get_all_request: GetAllRequest
+) -> JSONResponse:
+    return await get_all_posts_for_user_conditioned(
+        request.state.user_id, get_all_request
+    )  # type: ignore
 
 
 @router.get("/get/{post_id}")

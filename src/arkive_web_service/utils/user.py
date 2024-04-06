@@ -1,8 +1,10 @@
+from typing import Optional
+
+from sqlalchemy import select
+
 from arkive_db.models import User
 from arkive_web_service.database import db
-from sqlalchemy import select
 from arkive_web_service.enums import SignInProvider
-from typing import Optional
 from arkive_web_service.mappers import signin_provide_enum_to_database
 
 

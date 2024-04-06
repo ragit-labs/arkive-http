@@ -22,6 +22,7 @@ alembic = "*"
 pytz = "*"
 python-json-logger = "*"
 sentry-sdk = {extras = ["fastapi"], version = "*"}
+isort = "*"
 
 [dev-packages]
 black = "*"

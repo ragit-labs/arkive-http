@@ -1,19 +1,16 @@
-from fastapi import FastAPI, Depends
-import sentry_sdk
-from fastapi.middleware.cors import CORSMiddleware
-from .dependencies.auth import login_required
-import uvicorn
 import logging
 import logging.config
 import sys
+
+import sentry_sdk
+import uvicorn
+from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from .dependencies.auth import login_required
+from .endpoints import auth, internal, parser, posts, profile
 from .middlewares import LoggingMiddleware
 from .settings import settings
-
-from .endpoints import posts
-from .endpoints import auth
-from .endpoints import profile
-from .endpoints import parser
-from .endpoints import internal
 
 sentry_sdk.init(
     dsn=settings.SENTRY_DSN,
