@@ -50,8 +50,7 @@ async def get_all_posts_for_user_conditioned(
         query = select(Post).filter(Post.user_id == user_id)
         if filters:
             query = query.filter(*filters)
-        if sort_clause:
-            query = query.order_by(sort_clause)
+        query = query.order_by(sort_clause)
         query = query.limit(limit).offset(skip)
         result = (await session.execute(query)).scalars().all()
         return result
