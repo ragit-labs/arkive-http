@@ -17,3 +17,9 @@ class PostInsertRequestData(BaseModel):
     extra_metadata: Optional[dict] = Field(None, title="Extra metadata")
     tags: List[str] = Field(..., title="Tags for the post")
     user_id: str = Field(..., title="User id")
+
+
+class PostUpdateRequestData(BaseModel):
+    post_id: str = Field(..., title="Post id")
+    title: Optional[str] = Field(None, title="Title of the post")
+    content: Optional[str] = Field(None, title="Content of the post")

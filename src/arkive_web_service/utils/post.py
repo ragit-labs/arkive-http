@@ -107,3 +107,25 @@ async def insert_post_for_user(post_request_data: PostInsertRequestData):
         post.tags.extend(new_tags)
         session.add(post)
         await session.commit()
+
+
+async def update_post_for_user(
+    user_id: str, post_id: Optional[str], title: Optional[str], content: Optional[str]
+):
+    if not title and not content:
+        raise HTTPException(status_code=400, detail="No data to update")
+    async with db.session() as session:
+        post = (
+            await session.execute(select(Post).where(Post.id == post_id))
+        ).scalar_one_or_none()
+        if post is None:
+            raise HTTPException(status_code=404, detail="Post not found")
+        if str(post.user_id) != user_id:
+            raise HTTPException(
+                status_code=403, detail=f"You are not allowed to update this post {post.user_id} {user_id}"
+            )
+        if title:
+            post.title = title
+        if content:
+            post.content = content
+        await session.commit()
