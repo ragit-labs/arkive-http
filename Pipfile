@@ -23,6 +23,7 @@ pytz = "*"
 python-json-logger = "*"
 sentry-sdk = {extras = ["fastapi"], version = "*"}
 isort = "*"
+typing-extensions = "*"
 
 [dev-packages]
 black = "*"
