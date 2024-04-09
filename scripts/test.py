@@ -1,9 +1,10 @@
 import asyncio
 
-from sqlalchemy import select, text
+from sqlalchemy import func, select, text
+from sqlalchemy.dialects.postgresql import array_agg
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from arkive_db.models import Post, User
+from arkive_db.models import Post, Tag
 from arkive_web_service.post_filter_engine import (
     get_sqlalchemy_filter_clause,
     get_sqlalchemy_sort_clause,
@@ -32,7 +33,6 @@ async def main():
         value="2022-01-01T00:00:00",
         operator=GetAllRequestWhereOperator.gt,
     )
-    print(where)
     filters = get_sqlalchemy_filter_clause([where])
     limit = 10
     skip = 4
@@ -41,17 +41,15 @@ async def main():
     )
     sort_clause = get_sqlalchemy_sort_clause(sort)
     async with session_maker() as session:
-        user_id = "fd9bd111-c6c9-43ca-a533-c6e457f17823"
-        query = (
-            select(Post)
-            .filter(*filters)
-            .order_by(sort_clause)
-            .limit(limit)
-            .offset(skip)
+        user_id = "78df8199-30a6-43fe-9373-ceef4e115328"
+        keyword = "essay"
+        query = select(Post).filter(
+            Post.user_id == user_id,
+            Post.title.ilike(f"%{keyword}%"),
         )
-        result = await session.execute(query)
-        posts = result.scalars().all()
-        print(len(posts))
+        result = (await session.execute(query)).scalars().all()
+        for r in result:
+            print(r.title)
 
 
 asyncio.run(main())

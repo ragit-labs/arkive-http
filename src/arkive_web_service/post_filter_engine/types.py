@@ -43,6 +43,7 @@ class GetAllRequestSort(BaseModel):
 
 class GetAllRequest(BaseModel):
     where: Optional[List[GetAllRequestWhere]] = Field(None, title="Where clause")
+    tags: Optional[List[str]] = Field(None, title="Tags to filter by")
     sort: Optional[GetAllRequestSort] = Field(None, title="Sort by")
     limit: Optional[int] = Field(None, title="Limit the number of results")
     skip: Optional[int] = Field(None, title="Skip the first n results")

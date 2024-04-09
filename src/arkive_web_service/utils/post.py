@@ -1,10 +1,10 @@
 import uuid
-from typing import Optional, Sequence
+from typing import List, Optional, Sequence
 
 from fastapi import HTTPException
 from sqlalchemy import select
 
-from arkive_db.models import Post, Tag, User
+from arkive_db.models import Post, Tag, User, tag_post_association
 from arkive_web_service.database import db
 
 from ..post_filter_engine import (
@@ -50,8 +50,35 @@ async def get_all_posts_for_user_conditioned(
         query = select(Post).filter(Post.user_id == user_id)
         if filters:
             query = query.filter(*filters)
+        if tags := get_all_request.tags:
+            for tag in tags:
+                query = query.filter(Post.tags.any(Tag.id == tag))
         query = query.order_by(sort_clause)
         query = query.limit(limit).offset(skip)
+        result = (await session.execute(query)).scalars().all()
+        return result
+
+
+async def search_posts_for_user(user_id: str, keyword: str) -> Sequence[Post]:
+    async with db.session() as session:
+        query = (
+            select(Post)
+            .filter(
+                Post.user_id == user_id,
+                # Post.title.ilike(f"%{keyword}%") | Post.content.ilike(f"%{keyword}%"),
+                Post.title.ilike(f"%{keyword}%")
+                | Post.tags.any(Tag.id.ilike(f"%{keyword}%")),
+            )
+            .order_by(Post.timestamp.desc())
+            .limit(10)
+        )
+        result = (await session.execute(query)).scalars().all()
+        return result
+
+
+async def get_all_tags_for_user(user_id: str) -> Sequence[Tag]:
+    async with db.session() as session:
+        query = select(Tag).join(Post.tags).filter(Post.user_id == user_id)
         result = (await session.execute(query)).scalars().all()
         return result
 
@@ -79,15 +106,16 @@ async def remove_post_for_user(post_id: str, user_id: str):
 
 
 async def insert_post_for_user(post_request_data: PostInsertRequestData):
+    tags = ["-".join(tag.split()) for tag in post_request_data.tags]
     async with db.session() as session:
-        tags_query = select(Tag).where(Tag.name.in_(post_request_data.tags))
+        tags_query = select(Tag).where(Tag.id.in_(tags))
         tags_in_db = (await session.execute(tags_query)).scalars().all()
-        tag_names_in_db = [tag.name for tag in tags_in_db]
+        tag_ids_in_db = [tag.id for tag in tags_in_db]
         new_tags = []
 
-        for tag in post_request_data.tags:
-            if tag not in tag_names_in_db:
-                new_tag = Tag(id=uuid.uuid4(), name=tag)
+        for tag in tags:
+            if tag not in tag_ids_in_db:
+                new_tag = Tag(id=tag)
                 session.add(new_tag)
                 new_tags.append(new_tag)
 
@@ -122,7 +150,8 @@ async def update_post_for_user(
             raise HTTPException(status_code=404, detail="Post not found")
         if str(post.user_id) != user_id:
             raise HTTPException(
-                status_code=403, detail=f"You are not allowed to update this post {post.user_id} {user_id}"
+                status_code=403,
+                detail=f"You are not allowed to update this post {post.user_id} {user_id}",
             )
         if title:
             post.title = title

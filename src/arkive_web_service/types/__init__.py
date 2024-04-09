@@ -23,3 +23,7 @@ class PostUpdateRequestData(BaseModel):
     post_id: str = Field(..., title="Post id")
     title: Optional[str] = Field(None, title="Title of the post")
     content: Optional[str] = Field(None, title="Content of the post")
+
+
+class SearchRequestData(BaseModel):
+    keyword: str = Field(..., title="Keyword to search")

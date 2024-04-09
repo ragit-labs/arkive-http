@@ -1,15 +1,24 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 
 from ..dependencies.auth import admin_only, login_required
 from ..post_filter_engine.types import GetAllRequest
-from ..types import PostDeleteRequestData, PostInsertRequestData, PostUpdateRequestData
+from ..types import (
+    PostDeleteRequestData,
+    PostInsertRequestData,
+    PostUpdateRequestData,
+    SearchRequestData,
+)
 from ..utils.post import (
     get_all_posts_for_user_conditioned,
+    get_all_tags_for_user,
     get_post,
     insert_post_for_user,
     is_valid_uuid,
     remove_post_for_user,
+    search_posts_for_user,
     update_post_for_user,
 )
 
@@ -25,6 +34,11 @@ async def get_all_where(
     )  # type: ignore
 
 
+@router.post("/all_tags", dependencies=[Depends(login_required)])
+async def get_all_tags(request: Request) -> JSONResponse:
+    return await get_all_tags_for_user(request.state.user_id)  # type: ignore
+
+
 @router.get("/get/{post_id}")
 async def get(request: Request, post_id: str) -> JSONResponse:
     if not is_valid_uuid(post_id):
@@ -33,6 +47,23 @@ async def get(request: Request, post_id: str) -> JSONResponse:
     if post is None:
         raise HTTPException(status_code=404, detail="Not found")
     return post  # type: ignore
+
+
+@router.post("/search", dependencies=[Depends(login_required)])
+async def search_posts(request: Request, data: SearchRequestData) -> JSONResponse:
+    keyword = data.keyword.strip()
+    try:
+        if len(keyword) < 4:
+            raise HTTPException(
+                status_code=422, detail="Enter atleast 4 characters to search"
+            )
+        posts = await search_posts_for_user(request.state.user_id, keyword)
+    except Exception as ex:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Something went wrong while searching posts: {ex}",
+        )
+    return posts  # type: ignore
 
 
 @router.post("/delete", dependencies=[Depends(login_required)])
