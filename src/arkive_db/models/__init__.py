@@ -27,7 +27,7 @@ class Post(Base):
     __tablename__ = "post"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4()
+        UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4
     )
     title: Mapped[str] = mapped_column(Text(), nullable=False)
     content: Mapped[str] = mapped_column(Text(), nullable=False)
@@ -54,7 +54,7 @@ class User(Base):
     __tablename__ = "user"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4()
+        UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4
     )
     full_name: Mapped[str] = mapped_column(String(), nullable=False)
     first_name: Mapped[str] = mapped_column(String(), nullable=False)
