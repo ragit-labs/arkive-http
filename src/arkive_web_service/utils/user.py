@@ -42,6 +42,6 @@ async def insert_user_to_database(
         session.add(user)
         try:
             await session.commit()
+            return user
         except Exception as ex:
             raise Exception("Something went wrong while inserting the user", str(ex))
-        return user

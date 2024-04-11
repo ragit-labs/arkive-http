@@ -47,3 +47,4 @@ class GetAllRequest(BaseModel):
     sort: Optional[GetAllRequestSort] = Field(None, title="Sort by")
     limit: Optional[int] = Field(None, title="Limit the number of results")
     skip: Optional[int] = Field(None, title="Skip the first n results")
+    fields: List[str] = Field(title="Fields to return. Required.")

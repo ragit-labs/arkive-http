@@ -35,7 +35,6 @@ async def authenticate_user(google_access_token: str) -> User:
     email = user_info["email"]
     user = await get_user_from_database(email)
     if user is None:
-        # Create new user in database
         user = await insert_user_to_database(
             email,
             user_info.get("name"),
