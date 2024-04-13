@@ -106,7 +106,7 @@ async def remove_post_for_user(post_id: str, user_id: str):
 
 
 async def insert_post_for_user(post_request_data: PostInsertRequestData):
-    tags = ["-".join(tag.split()) for tag in post_request_data.tags]
+    tags = ["-".join(tag.split()).lower() for tag in post_request_data.tags]
     async with db.session() as session:
         tags_query = select(Tag).where(Tag.id.in_(tags))
         tags_in_db = (await session.execute(tags_query)).scalars().all()

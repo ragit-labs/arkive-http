@@ -43,6 +43,9 @@ async def authenticate_user(google_access_token: str) -> User:
             user_info.get("family_name", None),
             user_info.get("picture", None),
         )
+    user = await get_user_from_database(email)
+    if user is None:
+        raise Exception("Something went wrong. Could not find user in database.")
     return user
 
 
