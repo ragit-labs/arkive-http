@@ -5,10 +5,13 @@ from jose import jwt
 
 from ..constants import JWT_ALGORITHM, JWT_SECRET_KEY
 from ..utils.auth import parse_user_id_from_token
+import logging
+logger = logging.getLogger(__name__)
 
 
 async def _get_token(request: Request) -> str:
     authorization: Optional[str] = request.headers.get("Authorization")
+    print("==========Authorization: %s", authorization)
     if authorization is None:
         raise HTTPException(status_code=400, detail="Authorization header is not set.")
     token = None

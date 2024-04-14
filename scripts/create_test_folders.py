@@ -42,12 +42,13 @@ async def main():
     )
     sort_clause = get_sqlalchemy_sort_clause(sort)
     async with session_maker() as session:
-        user_id = "eb393cc4-d819-440b-90a1-f50c2d8c3d3b"
-        folder = Folder(
-            name="Test Folder",
+        user_id = "339e1929-fcda-49da-9116-03fc0cf24be7"
+        folder_names = ["Article", "Tech", "Design", "Research", "Misc"]
+        folders = [Folder(
+            name=folder_name,
             user_id=user_id,
-        )
-        session.add(folder)
+        ) for folder_name in folder_names]
+        session.add_all(folders)
         await session.commit()
 
 

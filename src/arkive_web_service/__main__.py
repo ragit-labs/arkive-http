@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .dependencies.auth import login_required
 from .endpoints import auth, internal, parser, posts, profile
-from .endpoints.v2 import notes
+from .endpoints.v2 import notes, folders, llm
 from .middlewares import LoggingMiddleware
 from .settings import settings
 
@@ -61,6 +61,8 @@ app.include_router(profile.router, dependencies=[Depends(login_required)])
 app.include_router(parser.router)
 app.include_router(internal.router)
 app.include_router(notes.router)
+app.include_router(folders.router)
+app.include_router(llm.router)
 
 
 def main():

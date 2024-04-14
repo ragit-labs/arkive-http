@@ -82,18 +82,31 @@ class Folder(Base):
     notes: Mapped[List[Note]] = relationship("Note", backref="folder", lazy="selectin")
 
 
+class NoteBlock(Base):
+    __tablename__ = "note_block"
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4
+    )
+    note_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("note.id"), nullable=False
+    )
+    content: Mapped[str] = mapped_column(Text(), nullable=False)
+    block_type: Mapped[str] = mapped_column(String(), nullable=False)
+    extra_metadata: Mapped[dict] = mapped_column(JSONB(), nullable=True)
+
+
 class Note(Base):
     __tablename__ = "note"
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4
     )
-    title: Mapped[str] = mapped_column(String(), nullable=True)
+    title: Mapped[str] = mapped_column(String(), nullable=False)
     session_id: Mapped[str] = mapped_column(String(), nullable=True)
     url: Mapped[str] = mapped_column(String(), nullable=True)
     content: Mapped[str] = mapped_column(Text(), nullable=True)
-    note: Mapped[str] = mapped_column(Text(), nullable=True)
+    blocks: Mapped[List[NoteBlock]] = relationship("NoteBlock", backref="note", lazy="selectin")
     folder_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("folder.id"), nullable=True
+        UUID(as_uuid=True), ForeignKey("folder.id"), nullable=False
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
