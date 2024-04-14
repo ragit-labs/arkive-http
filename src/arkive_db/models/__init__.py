@@ -68,3 +68,36 @@ class User(Base):
         ENUM(SignInProvider), nullable=False
     )
     extra_metadata: Mapped[dict] = mapped_column(JSONB(), nullable=True)
+
+
+class Folder(Base):
+    __tablename__ = "folder"
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4
+    )
+    name: Mapped[str] = mapped_column(String(), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
+    )
+    notes: Mapped[List[Note]] = relationship("Note", backref="folder", lazy="selectin")
+
+
+class Note(Base):
+    __tablename__ = "note"
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4
+    )
+    title: Mapped[str] = mapped_column(String(), nullable=True)
+    session_id: Mapped[str] = mapped_column(String(), nullable=True)
+    url: Mapped[str] = mapped_column(String(), nullable=True)
+    content: Mapped[str] = mapped_column(Text(), nullable=True)
+    note: Mapped[str] = mapped_column(Text(), nullable=True)
+    folder_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("folder.id"), nullable=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
+    )
+    timestamp: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
+    extra_metadata: Mapped[dict] = mapped_column(JSONB(), nullable=True)
+    note_type: Mapped[str] = mapped_column(String(), nullable=True)

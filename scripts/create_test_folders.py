@@ -5,7 +5,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import array_agg
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from arkive_db.models import Post, Tag
+from arkive_db.models import Post, Tag, Folder
 from arkive_web_service.post_filter_engine import (
     get_sqlalchemy_filter_clause,
     get_sqlalchemy_sort_clause,
@@ -43,17 +43,12 @@ async def main():
     sort_clause = get_sqlalchemy_sort_clause(sort)
     async with session_maker() as session:
         user_id = "eb393cc4-d819-440b-90a1-f50c2d8c3d3b"
-        fields = ["id", "tags", "title", "content", "url", "banner", "timestamp"]
-        fields_to_return = [getattr(Post, field) for field in fields]
-        subquery = select(Post).filter(Post.user_id == user_id)
-        print(subquery)
-        subquery = subquery.order_by(sort_clause)
-        subquery = subquery.limit(limit).offset(skip).subquery()
-        fields_to_return = [getattr(subquery, field) for field in fields]
-        query = select(*fields_to_return).select_from(subquery)
-        result = (await session.execute(query)).scalars().all()
-        for r in result:
-            print(r.title)
+        folder = Folder(
+            name="Test Folder",
+            user_id=user_id,
+        )
+        session.add(folder)
+        await session.commit()
 
 
 asyncio.run(main())
